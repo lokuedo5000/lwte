@@ -37,7 +37,40 @@ $ npm i express sharp multer
   </head>
   <body>
     <form action="/compress" method="post" enctype="multipart/form-data">
-      <input type="file" id="images" name="images" multiple />
+      <div class="inputs_list">
+        <label for="images">Seleccionar imagenes</label>
+        <input type="file" id="images" name="images" multiple />
+      </div>
+      <br>
+      <div class="inputs_list">
+        <label for="png_calidad">Nivel de compresion de imagenes (png)</label>
+        <br>
+        <p>El valor de calidad controla la cantidad de información que se guarda en la imagen. Un valor mayor de calidad (por ejemplo, 100) preservará más detalles de la imagen original, mientras que un valor menor (por ejemplo, 1) reducirá la calidad y aumentará la compresión. En otras palabras, a medida que disminuye la calidad, aumenta la compresión, lo que conduce a una imagen con menor tamaño de archivo pero con una menor calidad visual.</p>
+        <select name="compressionLevel" id="png_calidad">
+          <option value="1">1%</option>
+          <option value="2">2%</option>
+          <option value="3">3%</option>
+          <option value="4">4%</option>
+          <option value="5">5%</option>
+          <option value="6">6%</option>
+          <option value="7">7%</option>
+          <option value="8">8%</option>
+          <option value="9">9%</option>
+        </select>
+      </div>
+      <br>
+      <div class="inputs_list">
+        <label for="jpg_calidad">Nivel de compresion de imagenes (jpg)</label>
+        <br>
+        <p>Un valor de compresión de 9 (máxima compresión) se traducirá en una mayor compresión de la imagen, lo que resultará en un tamaño de archivo más pequeño, pero también puede afectar la calidad de la imagen, especialmente si se usan imágenes con muchos detalles o gradientes.</p>
+        <select name="quality" id="jpg_calidad">
+          <option value="20">20%</option>
+          <option value="40">40%</option>
+          <option value="60">60%</option>
+          <option value="80">80%</option>
+        </select>
+      </div>
+
       <button type="submit">Comprimir imágenes</button>
     </form>
 
@@ -90,52 +123,77 @@ Luego, el código utiliza `Sharp` para comprimir cada imagen que se ha cargado. 
 
 ```javascript
 try {
-  // Archivos seleccionados
-  const files = req.files;
+    // Validar que se hayan seleccionado imágenes
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send("Debe seleccionar al menos una imagen.");
+    }
 
-  // Comprimir cada imagen utilizando Sharp
-  const compressedImages = await Promise.all(
-    files.map(async (file) => {
-      // datos de las imagenes
-      const { originalname, path } = file;
+    // el valor de para comprimir las imagenes png
+    var levelpng = req.body.compressionLevel;
 
-      const outputPath = "pagina" + "/public" + `/compressed/${originalname}`;
+    // el valor de para comprimir las imagenes jpg
+    var qualityjpg = req.body.quality;
 
-      // Detectar el formato de archivo original y guardar la imagen en el mismo formato
-      const image = sharp(path);
-      const metadata = await image.metadata();
-      const format = metadata.format;
 
-      // Comprimir la imagen con una calidad del 80%
-      await image
-        .toFormat(format)
-        .jpeg({ quality: 80 })
-        .png({ compressionLevel: 9 })
-        .toFile(outputPath);
 
-      // Obtener el nuevo peso y enviar la URL de la imagen comprimida al cliente
-      const compressedMetadata = await sharp(outputPath).metadata();
-      const compressedSize = fs.statSync(outputPath).size;
-      const compressedImageUrl = `http://localhost:3000/compressed/${originalname}`;
+    // Validar que solo se hayan enviado archivos de imagen
+    const allowedExtensions = ["jpg", "jpeg", "png"];
+    const invalidFiles = req.files.filter(
+      (file) =>
+        !allowedExtensions.includes(
+          file.originalname.split(".").pop().toLowerCase()
+        )
+    );
+    if (invalidFiles.length > 0) {
+      return res
+        .status(400)
+        .send("Solo se permiten archivos de imagen (JPG, JPEG, PNG).");
+    }
 
-      // Eliminar el archivo original
-      fs.unlinkSync(path);
+    // Comprimir cada imagen utilizando Sharp
+    const compressedImages = await Promise.all(
+      req.files.map(async (file) => {
+        // Datos de las imágenes
+        const { originalname, path } = file;
 
-      // Devolver un objeto con la información de la imagen comprimida
-      return {
-        originalname,
-        compressedUrl: compressedImageUrl,
-        compressedSize,
-      };
-    })
-  );
+        // Ruta donde se almacenará la imagen comprimida
+        const outputPath = "pagina" + "/public" + `/compressed/${originalname}`;
 
-  // Enviar una respuesta al cliente con la lista de imágenes comprimidas
-  res.json(compressedImages);
-} catch (error) {
-  console.error(error);
-  res.status(500).send("Ocurrió un error al comprimir las imágenes.");
-}
+        // Detectar el formato de archivo original y guardar la imagen en el mismo formato
+        const image = sharp(path);
+        const metadata = await image.metadata();
+        const format = metadata.format;
+
+        // Comprimir la imagen con una calidad del 80%
+        await image
+          .toFormat(format)
+          .png({ compressionLevel: parseInt(levelpng) })
+          .jpeg({ quality:  parseInt(qualityjpg) })
+          .toFile(outputPath);
+
+        // Obtener el nuevo peso y enviar la URL de la imagen comprimida al cliente
+        const compressedMetadata = await sharp(outputPath).metadata();
+        const compressedSize = fs.statSync(outputPath).size;
+        const compressedImageUrl = `http://localhost:3000/compressed/${originalname}`;
+
+        // Eliminar el archivo original
+        fs.unlinkSync(path);
+
+        // Devolver un objeto con la información de la imagen comprimida
+        return {
+          originalname,
+          compressedUrl: compressedImageUrl,
+          compressedSize,
+        };
+      })
+    );
+
+    // Enviar una respuesta al cliente con la lista de imágenes comprimidas
+    res.json(compressedImages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Ocurrió un error al comprimir las imágenes.");
+  }
 ```
 
 <br>
@@ -164,7 +222,7 @@ const upload = multer({ dest: "uploads/" });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
+app.set("views", path.join(__dirname, "pagina", "views"));
 app.use(express.static(path.join(__dirname, "pagina", "public")));
 
 // Pagina de Inicio
@@ -175,15 +233,40 @@ app.get("/", (req, res) => {
 // Ruta para comprimir
 app.post("/compress", upload.array("images"), async (req, res) => {
   try {
-    // Archivos seleccionados
-    const files = req.files;
+    // Validar que se hayan seleccionado imágenes
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send("Debe seleccionar al menos una imagen.");
+    }
+
+    // el valor de para comprimir las imagenes png
+    var levelpng = req.body.compressionLevel;
+
+    // el valor de para comprimir las imagenes jpg
+    var qualityjpg = req.body.quality;
+
+
+
+    // Validar que solo se hayan enviado archivos de imagen
+    const allowedExtensions = ["jpg", "jpeg", "png"];
+    const invalidFiles = req.files.filter(
+      (file) =>
+        !allowedExtensions.includes(
+          file.originalname.split(".").pop().toLowerCase()
+        )
+    );
+    if (invalidFiles.length > 0) {
+      return res
+        .status(400)
+        .send("Solo se permiten archivos de imagen (JPG, JPEG, PNG).");
+    }
 
     // Comprimir cada imagen utilizando Sharp
     const compressedImages = await Promise.all(
-      files.map(async (file) => {
-        // datos de las imagenes
+      req.files.map(async (file) => {
+        // Datos de las imágenes
         const { originalname, path } = file;
 
+        // Ruta donde se almacenará la imagen comprimida
         const outputPath = "pagina" + "/public" + `/compressed/${originalname}`;
 
         // Detectar el formato de archivo original y guardar la imagen en el mismo formato
@@ -194,8 +277,8 @@ app.post("/compress", upload.array("images"), async (req, res) => {
         // Comprimir la imagen con una calidad del 80%
         await image
           .toFormat(format)
-          .jpeg({ quality: 80 })
-          .png({ compressionLevel: 9 })
+          .png({ compressionLevel: parseInt(levelpng) })
+          .jpeg({ quality:  parseInt(qualityjpg) })
           .toFile(outputPath);
 
         // Obtener el nuevo peso y enviar la URL de la imagen comprimida al cliente
@@ -226,6 +309,7 @@ app.post("/compress", upload.array("images"), async (req, res) => {
 app.listen(3000, () => {
   console.log("El servidor está funcionando en el puerto 3000");
 });
+
 ```
 
 <br>
