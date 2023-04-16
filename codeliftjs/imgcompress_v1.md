@@ -45,7 +45,7 @@ $ npm i express sharp multer
       <div class="inputs_list">
         <label for="png_calidad">Nivel de compresion de imagenes (png)</label>
         <br>
-        <p>El valor de calidad controla la cantidad de información que se guarda en la imagen. Un valor mayor de calidad (por ejemplo, 100) preservará más detalles de la imagen original, mientras que un valor menor (por ejemplo, 1) reducirá la calidad y aumentará la compresión. En otras palabras, a medida que disminuye la calidad, aumenta la compresión, lo que conduce a una imagen con menor tamaño de archivo pero con una menor calidad visual.</p>
+        <p>Un valor de compresión de 9 (máxima compresión) se traducirá en una mayor compresión de la imagen, lo que resultará en un tamaño de archivo más pequeño, pero también puede afectar la calidad de la imagen, especialmente si se usan imágenes con muchos detalles o gradientes.</p>
         <select name="compressionLevel" id="png_calidad">
           <option value="1">1%</option>
           <option value="2">2%</option>
@@ -62,7 +62,7 @@ $ npm i express sharp multer
       <div class="inputs_list">
         <label for="jpg_calidad">Nivel de compresion de imagenes (jpg)</label>
         <br>
-        <p>Un valor de compresión de 9 (máxima compresión) se traducirá en una mayor compresión de la imagen, lo que resultará en un tamaño de archivo más pequeño, pero también puede afectar la calidad de la imagen, especialmente si se usan imágenes con muchos detalles o gradientes.</p>
+        <p>El valor de calidad controla la cantidad de información que se guarda en la imagen. Un valor mayor de calidad (por ejemplo, 100) preservará más detalles de la imagen original, mientras que un valor menor (por ejemplo, 1) reducirá la calidad y aumentará la compresión. En otras palabras, a medida que disminuye la calidad, aumenta la compresión, lo que conduce a una imagen con menor tamaño de archivo pero con una menor calidad visual.</p>
         <select name="quality" id="jpg_calidad">
           <option value="20">20%</option>
           <option value="40">40%</option>
@@ -133,8 +133,6 @@ try {
 
     // el valor de para comprimir las imagenes jpg
     var qualityjpg = req.body.quality;
-
-
 
     // Validar que solo se hayan enviado archivos de imagen
     const allowedExtensions = ["jpg", "jpeg", "png"];
@@ -243,8 +241,6 @@ app.post("/compress", upload.array("images"), async (req, res) => {
 
     // el valor de para comprimir las imagenes jpg
     var qualityjpg = req.body.quality;
-
-
 
     // Validar que solo se hayan enviado archivos de imagen
     const allowedExtensions = ["jpg", "jpeg", "png"];
