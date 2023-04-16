@@ -288,7 +288,7 @@ app.post("/compress", upload.array("images"), async (req, res) => {
         const metadata = await image.metadata();
         const format = metadata.format;
 
-        // Comprimir la imagen con una calidad del 80%
+        // Comprimir la imagen con una calidad del {levelpng, qualityjpg}
         await image
           .toFormat(format)
           .png({ compressionLevel: parseInt(levelpng) })
