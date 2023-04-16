@@ -1,6 +1,19 @@
-## Comencemos
+### Descripcion
+En este tutorial, aprenderás cómo crear un compresor de imágenes sin reducir su tamaño y sin pérdida significativa de calidad utilizando Node.js y la biblioteca sharp.
+<br>
+Sharp es una biblioteca de procesamiento de imágenes de alto rendimiento para Node.js que nos permitirá aplicar la compresión sin pérdida a nuestras imágenes.
+<br>
+El objetivo de este compresor de imágenes es reducir el tamaño del archivo de imagen sin afectar su calidad visual. Para ello, utilizaremos los algoritmos de compresión sin pérdida que ofrece sharp.
+<br>
+En la primera parte del tutorial, explicaremos los conceptos básicos de la compresión de imágenes y cómo funciona el algoritmo de compresión sin pérdida que utilizaremos. Luego, crearemos una aplicación de línea de comandos utilizando Node.js y sharp para procesar imágenes y aplicar la compresión sin pérdida.
+<br>
+En la aplicación, permitiremos al usuario especificar la calidad de la imagen comprimida utilizando un valor de 0 a 100. Utilizaremos el módulo fs de Node.js para leer y escribir archivos de imagen.
+<br>
+Al finalizar el tutorial, tendrás un compresor de imágenes funcional que te permitirá reducir el tamaño de los archivos de imagen sin afectar la calidad visual. Además, habrás aprendido cómo utilizar la biblioteca sharp de Node.js para aplicar la compresión sin pérdida en imágenes.
+<br>
+### Comencemos
 
-#### Para iniciar con este tutorial debes seguir los pasos
+#### Para iniciar con este tutorial debes seguir estos pasos:
 
 1. Abre una terminal o línea de comandos en tu equipo.
 2. Crea una nueva carpeta para tu proyecto e ingresa a ella:
