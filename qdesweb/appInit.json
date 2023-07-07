@@ -1,6 +1,9 @@
 [
   {
     "app": "search",
+    "title": "QDesWeb | Search",
+    "iconURL": "apps/qd.ico",
+    "active": true,
     "start": true
   }
 ]
