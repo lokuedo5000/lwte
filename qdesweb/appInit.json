@@ -1,5 +1,12 @@
 [
   {
+    "app": "apps",
+    "title": "Apps",
+    "iconURL": "apps/icons8-apps-30.png",
+    "active": false,
+    "start": true
+  },
+  {
     "app": "search",
     "title": "QDesWeb | Search",
     "iconURL": "apps/qd.ico",
