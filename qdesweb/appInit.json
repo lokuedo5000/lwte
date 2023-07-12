@@ -3,14 +3,14 @@
     "app": "apps",
     "title": "Apps",
     "iconURL": "apps/icons8-apps-30.png",
-    "active": false,
+    "active": true,
     "start": true
   },
   {
     "app": "search",
     "title": "QDesWeb | Search",
     "iconURL": "apps/qd.ico",
-    "active": true,
-    "start": true
+    "active": false,
+    "start": false
   }
 ]
